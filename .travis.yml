@@ -1,0 +1,19 @@
+sudo: required
+
+language: generic
+
+services:
+  - docker
+
+before_install:
+  - echo "start creating an image with dockerfile"
+  - docker build -t dorigury/docker-react-app -f Dockerfile.dev .
+
+script:
+  - docker run -e CI=true dorigury/docker-react-app npm run test
+
+after_success:
+  - echo "Test success"
+  - docker build -t dorigury/docker-react-app .
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  - docker push dorigury/docker-react-app  
